@@ -1,0 +1,508 @@
+import random
+file=open("battle_arena.txt", "r+")
+materials_data=file.readline().split()
+materials={"wood":0, "stone":0, "iron":0, "diamond":0, "red_diamond":0, "stick":0, "string":0, "dragon_tooth":0, "bolt_charge":0}
+for item in materials_data:
+  materials[item]=materials_data.count(item)
+weapons_data=file.readline().split()
+chests=int(file.readline())
+file.close()
+weapons=["dagger", "sword", "bow", "crossbow", "trident", "brave_bow"]
+crafts={"dagger":["material", 1, "stick", 1], "sword":["material", 2, "stick", 1], "bow":["material", 2, "string", 1], "crossbow":["material", 3, "string", 1], "trident":["material", 3, "dragon_tooth", 3], "brave_bow":["red_diamond", 3, "string", 1, "bolt_charge", 1]}
+file.close()
+
+#Actions
+
+action=raw_input("Choose between Crafting recipes, Inventory, Craft, Uncraft, Open chest, Exchange and Battle!: ")
+
+#CRAFTING RECIPES
+
+if action=="Crafting recipes":
+  print """
+  """
+  for item in weapons:
+    print item+":"
+    i=-2
+    i2=-1
+    while i2<len(crafts[item])-2:
+      i+=2
+      i2+=2
+      print crafts[item][i2],
+      print crafts[item][i]
+    print """
+    """
+
+#INVENTORY
+    
+if action=="Inventory":
+  print """
+  """
+  print "Materials:"
+  for item in ["stick", "string", "wood", "stone", "iron", "diamond", "red_diamond", "dragon_tooth"]:
+    print materials[item], item+","
+  print materials["bolt_charge"], "bolt_charge"
+  print """
+  """
+  i=-2
+  i2=-1
+  print "Weapons:"
+  if len(weapons_data)==0:
+    print """
+    """
+  else:
+    while i2<len(weapons_data)-2:
+      i+=2
+      i2+=2
+      print weapons_data[i2]+" "+weapons_data[i]
+      if weapons_data[i]=="dagger":
+        weapon_damage=3.
+        weapon_range=1
+        if weapons_data[i2]=="stone":
+          weapon_damage+=0.5
+        elif weapons_data[i2]=="iron":
+          weapon_damage+=1
+        elif weapons_data[i2]=="diamond" and weapons_data[i]:
+          weapon_damage+=2
+        print "Damage: "+str(weapon_damage)
+        print "Range: "+str(weapon_range)
+        print """
+      """
+      if weapons_data[i]=="sword":
+        weapon_damage=5.
+        weapon_range=1
+        if weapons_data[i2]=="stone":
+          weapon_damage+=0.5
+        elif weapons_data[i2]=="iron":
+          weapon_damage+=1
+        elif weapons_data[i2]=="diamond":
+          weapon_damage+=2
+        print "Damage: "+str(weapon_damage)  
+        print "Range: "+str(weapon_range)
+        print """
+      """
+      if weapons_data[i]=="bow":
+        weapon_damage=5.
+        weapon_range=3
+        if weapons_data[i2]=="stone":
+          weapon_damage+=0.5
+        elif weapons_data[i2]=="iron":
+          weapon_damage+=1
+        elif weapons_data[i2]=="diamond":
+          weapon_damage+=2
+        print "Damage: "+str(weapon_damage)
+        print "Range: "+str(weapon_range)
+        print """
+      """
+      if weapons_data[i]=="crossbow":
+        weapon_damage=7.
+        weapon_range=3
+        if weapons_data[i2]=="stone":
+         weapon_damage+=0.5
+        elif weapons_data[i2]=="iron":
+          weapon_damage+=1
+        elif weapons_data[i2]=="diamond":
+          weapon_damage+=2
+        print "Damage: "+str(weapon_damage)
+        print "Range: "+str(weapon_range)
+        print """
+      """
+      if weapons_data[i]=="trident":
+        weapon_damage=13.
+        weapon_range=2
+        if weapons_data[i2]=="stone":
+          weapon_damage+=0.5
+        elif weapons_data[i2]=="iron":
+          weapon_damage+=1
+        elif weapons_data[i2]=="diamond":
+          weapon_damage+=2
+        print "Damage: "+str(weapon_damage)
+        print "Range: "+str(weapon_range)
+        print """  
+        """
+      if weapons_data[i]=="brave_bow":
+        weapon_damage=17
+        weapon_range=5
+        print "Damage: "+str(weapon_damage)
+        print "Range: "+str(weapon_range)
+        print """
+      """
+  print "Chests: "+str(chests)
+
+#CRAFT  
+  
+if action=="Craft":
+  print """
+  """
+  c=True
+  weapon=raw_input("What do you want to craft?: ")
+  if weapon in "daggerswordbowcrossbowtridentbrave_bow":
+    if weapon in weapons_data:
+      print "You already own a "+weapon+"."
+    else:
+      material=raw_input("What material do you want it to be?: ")
+      if weapon=="brave_bow":
+        c=False
+        if material!="red_diamond":
+          print "The brave_bow must be made of red_diamond!"
+          material="red_diamond"
+      if material=="red_diamond" and weapon!="brave_bow":
+        print "Only the brave_bow can be crafted from red_diamond! Your weapon will be made of diamond instead."
+      if material in "woodstoneirondiamondred_diamond":
+        print "Current materials:"
+        for item in ["stick", "string", "wood", "stone", "iron", "diamond", "red_diamond", "dragon_tooth"]:
+          print materials[item], item+","
+        print materials["bolt_charge"], "bolt_charge"
+        status=raw_input("That will be "+str(crafts[weapon])+". Do you want to proceed?: ")
+        if status=="Yes":
+          a=False
+          b=False
+          if crafts[weapon][0]=="material":
+            if materials[material]>=crafts[weapon][1]:
+              a=True
+          else:
+            if materials[crafts[weapon][0]]>=crafts[weapon][1]:
+              a=True
+          if materials[crafts[weapon][2]]>=crafts[weapon][3]:
+            b=True
+          if len(crafts[weapon])>4:
+            if materials[crafts[weapon][4]]>=crafts[weapon][5]:
+              c=True
+          if a and b and c:
+            for item in range(0, crafts[weapon][1]):
+              materials_data.remove(material)
+              materials[material]-=1
+            for item in range(0, crafts[weapon][3]):
+              materials_data.remove(crafts[weapon][2])
+              materials[crafts[weapon][2]]-=1
+            if len(crafts[weapon])>4:
+              for item in range(0, crafts[weapon][5]):
+                materials_data.remove(crafts[weapon][4])
+                materials[crafts[weapon][4]]-=1
+            weapons_data.append(weapon)
+            weapons_data.append(material)
+          else:
+            print "You don't have enough materials!"
+      else:
+        print "Invalid material!"
+  else:
+    print "Invalid weapon!"
+
+#UNCRAFT
+    
+elif action=="Uncraft":
+  print """
+  """
+  weapon=raw_input("What do you want to uncraft?: ")
+  if weapon in weapons_data:
+    for item in range(0, crafts[weapon][1]):
+      materials_data.append(weapons_data[weapons_data.index(weapon)+1])
+    for item in range(0, crafts[weapon][3]):
+      materials_data.append(crafts[weapon][2])
+    if len(crafts[weapon])>4:
+      for item in range(0, crafts[weapon][5]):
+        materials_data.append(crafts[weapon][4])
+    del weapons_data[weapons_data.index(weapon)+1]
+    weapons_data.remove(weapon)
+  else:
+    "You do not own such weapon!"
+
+#OPEN CHEST
+    
+elif action=="Open chest":
+  print """
+  """
+  random_item=[]
+  random_chest=[]
+  for item in range(0, 70):
+    random_chest.append("wood")
+  for item in range(0, 25):
+    random_chest.append("iron")
+  for item in range(0, 5):
+    random_chest.append("diamond")
+  chest=random.choice(random_chest)
+  if chest=="wood":
+    for item in range(0, 27):
+      random_item.append("wood")
+    for item in range(0, 20):
+      random_item.append("stone")
+    for item in range(0, 10):
+      random_item.append("iron")
+    for item in range(0, 5):
+      random_item.append("diamond")
+    for item in range(0, 3):
+      random_item.append("red_diamond")
+    for item in range(0, 20):
+      random_item.append("stick")
+    for item in range(0, 10):
+      random_item.append("string")
+    for item in range(0, 5):
+      random_item.append("dragon_tooth")
+    for item in range(0, 3):
+      random_item.append("bolt_charge")
+  elif chest=="iron":
+    for item in range(0, 30):
+      random_item.append("iron")
+    for item in range(0, 25):
+      random_item.append("stick")
+    for item in range(0, 15):
+      random_item.append("string")
+    for item in range(0, 10):
+      random_item.append("diamond")
+    for item in range(0, 5):
+      random_item.append("red_diamond")
+    for item in range(0, 10):
+      random_item.append("dragon_tooth")
+    for item in range(0, 5):
+      random_item.append("bolt_charge")
+  elif chest=="diamond":
+    for item in range(0, 45):
+      random_item.append("iron")
+    for item in range(0, 20):
+      random_item.append("diamond")
+    for item in range(0, 10):
+      random_item.append("red_diamond")
+    for item in range(0, 15):
+      random_item.append("dragon_tooth")
+    for item in range(0, 10):
+      random_item.append("bolt_charge")
+  if chests>0:
+    print "You got a "+chest+" chest!"
+    print "Chest loot:"
+    for item in range(0, 3):
+      loot=random.choice(random_item)
+      materials_data.append(loot)
+      print loot
+    chests-=1
+    print "Remaining chests: "+str(chests)
+  else:
+    print "You don't have any chests!"
+
+#EXCHANGE    
+    
+elif action=="Exchange":
+  print """
+  """
+  exchanged=raw_input("You need 3 items of one kind to pass to the next level (wood to stone, stone to iron, iron to diamond, diamond to red_diamond). What item do you want to exchange?: ")
+  if materials[exchanged]>=3:
+    if exchanged=="wood":
+      for item in range(0, 3):
+        materials_data.remove(exchanged)
+        materials[exchanged]-=1
+      materials_data.append("stone")
+      materials["stone"]+=1
+    elif exchanged=="stone":
+      for item in range(0, 3):
+        materials_data.remove(exchanged)
+        materials[exchanged]-=1
+      materials_data.append("iron")
+      materials["iron"]+=1
+    elif exchanged=="iron":
+      for item in range(0, 3):
+        materials_data.remove(exchanged)
+        materials[exchanged]-=1
+      materials_data.append("diamond")
+      materials["diamond"]+=1
+    elif exchanged=="diamond":
+      for item in range(0, 3):
+        materials_data.remove(exchanged)
+        materials[exchanged]-=1
+      materials_data.append("red_diamond")
+      materials["red_diamond"]+=1
+  else:
+    print "You don't have enough "+exchanged+"!"
+
+#BATTLE    
+    
+elif action=="Battle":
+  print """
+  """
+  dodge=[]
+  crit=[]
+  for item in range(0, 90):
+    dodge.append("hit")
+  for item in range(0, 10):
+    dodge.append("dodge")
+  for item in range(0, 80):
+    crit.append("hit")
+  for item in range(0, 20):
+    crit.append("crit")
+  weapon_range=0
+  weapon_damage=0
+  hp=20
+  enemy_range=0
+  enemy_damage=0
+  enemy_hp=0
+  pos=0
+  enemy_pos=9
+  chest_reward=0
+  enemy_types=["brute", "fiend", "elite fiend", "ravager", "destroyer"]
+  enemy_type=random.choice(enemy_types)
+  if enemy_type=="fiend":
+    enemy_range=2
+    enemy_damage=5
+    enemy_hp=15.
+    chest_reward=1
+    print "You are facing a fiend. Stats:"
+    print "Range: "+str(enemy_range)
+    print "Damage: "+str(enemy_damage)
+    print "HP: "+str(enemy_hp)
+    print "Reward: "+str(chest_reward)
+  if enemy_type=="elite fiend":
+    enemy_range=2
+    enemy_damage=7
+    enemy_hp=15.
+    chest_reward=2
+    print "You are facing an elite fiend. Stats:"
+    print "Range: X"
+    print "Damage: "+str(enemy_damage)
+    print "HP: "+str(enemy_hp)
+    print "Longshot: The elite fiend's range is always 1 longer than your weapon's."
+    print "Reward: "+str(chest_reward)
+  if enemy_type=="brute":
+    enemy_range=1
+    enemy_damage=5
+    enemy_hp=20.
+    chest_reward=1
+    print "You are facing a brute. Stats:"
+    print "Range: "+str(enemy_range)
+    print "Damage: "+str(enemy_damage)
+    print "HP: "+str(enemy_hp)
+    print "Reward: "+str(chest_reward)
+  if enemy_type=="ravager":
+    enemy_range=1
+    enemy_damage=10
+    enemy_hp=30.
+    chest_reward=3
+    print "You are facing a ravager. Stats:"
+    print "Range: "+str(enemy_range)
+    print "Damage: "+str(enemy_damage)
+    print "HP: "+str(enemy_hp)
+    print "Stunning smash: 30% chance of being stunned when hit."
+    print "Reward: "+str(chest_reward)
+  if enemy_type=="destroyer":
+    enemy_range=1
+    enemy_damage=10
+    enemy_hp=50.
+    chest_reward=5
+    print "You are facing a destroyer. Stats:"
+    print "Range: "+str(enemy_range)
+    print "Damage: "+str(enemy_damage)
+    print "HP: "+str(enemy_hp)
+    print "Super punch: 10% chance an attack will deal 13 damage."
+    print "Reward: "+str(chest_reward)
+  weapon=raw_input("Choose your weapon: ")
+  if weapon in weapons_data and weapon in "daggerswordbowcrossbowtridentbrave_bow":
+    if weapon=="dagger":
+      weapon_damage=3.
+      weapon_range=1
+    elif weapon=="sword":
+      weapon_damage=5.
+      weapon_range=1
+    elif weapon=="bow":
+      weapon_damage=5.
+      weapon_range=3
+    elif weapon=="crossbow":
+      weapon_damage=7.
+      weapon_range=3
+    elif weapon=="trident":
+      weapon_damage=13.
+      weapon_range=2
+    elif weapon=="brave_bow":
+      weapon_damage=17
+      weapon_range=5
+    if weapons_data[weapons_data.index(weapon)+1]=="stone":
+      weapon_damage+=0.5
+    if weapons_data[weapons_data.index(weapon)+1]=="iron":
+      weapon_damage+=1
+    if weapons_data[weapons_data.index(weapon)+1]=="diamond" and weapon!="brave_bow":
+      weapon_damage+=2
+    turn=1
+    print """
+    """
+    stun=[]
+    for item in range(0, 70):
+      stun.append("hit")
+    for item in range(0, 30):
+      stun.append("stun")
+    stunned=0
+    super_punch=[]
+    for item in range(0, 90):
+      super_punch.append("hit")
+    for item in range(0, 10):
+      super_punch.append("super punch")
+    super_or_not="hit"
+    if enemy_type=="elite fiend":
+      enemy_range=weapon_range+1
+    while hp>0 and enemy_hp>0:
+      if turn==1:
+        if stunned==1:
+          print "You are stunned!"
+          stunned=0
+        else:
+          if (enemy_pos-pos)<=weapon_range:
+            dodge_or_not=random.choice(dodge)
+            if dodge_or_not=="hit":
+              crit_or_not=random.choice(crit)
+              if crit_or_not=="crit":
+                weapon_damage+=3
+                enemy_hp-=weapon_damage
+                print "Critical hit! Your "+weapon+" hits the "+enemy_type+" for "+str(weapon_damage)+" damage."
+                weapon_damage-=3
+              else:
+                enemy_hp-=weapon_damage
+                print "Your "+weapon+" hits the "+enemy_type+" for "+str(weapon_damage)+" damage."
+            else:
+              print "The "+enemy_type+" dodges your attack!"
+          else:
+            pos+=1
+            print "You advance to position "+str(pos)+"."
+          print "Your health is "+str(hp)+"."
+        print """
+        """
+        turn=0
+      elif turn==0:
+        if (enemy_pos-pos)<=enemy_range:
+          dodge_or_not=random.choice(dodge)
+          if dodge_or_not=="hit":
+            stun_or_not=random.choice(stun)
+            if enemy_type=="ravager":
+              if stun_or_not=="stun":
+                print "The ravager stuns you!"
+                stunned=1
+            elif enemy_type=="destroyer":
+              super_or_not=random.choice(super_punch)
+              if super_or_not=="super punch":
+                print "Super Punch! The destroyer hits you for 13 damage."
+                hp-=13
+            if super_or_not!="super punch":
+              hp-=enemy_damage
+              print "The "+enemy_type+" hits you for "+str(enemy_damage)+" damage."
+          else:
+            print "You dodge the "+enemy_type+"'s attack!"
+        else:
+          enemy_pos-=1
+          print "The "+enemy_type+" advances to position "+str(enemy_pos)+"."
+        print "The "+enemy_type+"'s health is "+str(enemy_hp)+"."
+        print """
+        """
+        turn=1
+    if hp>0:
+      print "You win! You obtained "+str(chest_reward)+" chests."
+      chests+=chest_reward
+    elif enemy_hp>0:
+      print "The "+enemy_type+" wins."
+  elif weapon not in "daggerswordbowcrossbowtridentbrave_bow":
+    print "Invalid weapon!"
+  else:
+    print "You do not own such weapon!"
+
+#RESET    
+    
+elif action=="Reset":
+  materials_data=[]
+  materials={}
+  weapons_data=[]
+  chests=3
+writer=open("battle_arena.txt", "w")
+writer.write(" ".join(materials_data)+"\n"+" ".join(weapons_data)+"\n"+str(chests))
+writer.close()
